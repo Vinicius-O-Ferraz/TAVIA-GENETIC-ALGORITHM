@@ -7,5 +7,5 @@ class periodo:
     def __repr__(self):
         return "\n".join(str(linha) for linha in self.matriz)
 
-periodo1 = periodo()
-print(periodo1)
+# periodo1 = periodo()
+# print(periodo1)

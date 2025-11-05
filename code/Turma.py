@@ -8,5 +8,5 @@ class turma:
     def __repr__(self):
         return f"{self.id_turma}"
     
-turma1 = turma("TAVIA", "Prof. Silva", '23T45', "2024.1")
-print(turma1)
+# turma1 = turma("TAVIA", "Prof. Silva", '2T1', "2024.1")
+# print(turma1)
