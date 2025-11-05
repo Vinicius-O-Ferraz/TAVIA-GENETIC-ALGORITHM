@@ -33,4 +33,3 @@ professores = {
     "Marcos Cardoso":["PSED"],
     "Ricardo Souza":["ER"],
 }
-    
