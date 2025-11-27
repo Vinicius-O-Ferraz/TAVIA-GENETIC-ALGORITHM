@@ -38,7 +38,6 @@ def random_initialize_solution(sol_id=1, turmas=None):
         for r in range(rows):
             for c in range(cols):
                 slots.append((p_idx, r, c))
-                print(s)
 
     random.shuffle(slots)
 
@@ -51,8 +50,6 @@ def random_initialize_solution(sol_id=1, turmas=None):
 
 def main():
     s = random_initialize_solution(sol_id=1)
-    print(s)
-
 
 if __name__ == '__main__':
     main()
