@@ -1,6 +1,7 @@
 from algoritmo_abstrato import AlgoritmoAbstrato
 from Random_Init import random_initialize_solution
 import random
+from Solucao import solucao
 
 class AGSimples(AlgoritmoAbstrato):
 
@@ -68,7 +69,9 @@ class AGSimples(AlgoritmoAbstrato):
                     for p in individuo.periodos:
                         subj = p.matriz[r][c]
                         if subj and subj != 0:
-                            prof = subject_to_prof.get(subj)
+                            # subj may be like 'PCO-1', map to base code
+                            base = subj.split("-")[0] if isinstance(subj, str) else subj
+                            prof = subject_to_prof.get(base)
                             if prof:
                                 prof_counts[prof] = prof_counts.get(prof, 0) + 1
                     for prof, cnt in prof_counts.items():
@@ -82,62 +85,36 @@ class AGSimples(AlgoritmoAbstrato):
             return 1 / s
 
     def avaliar_populacao(self):
-        for individuo in self.populacao:
-            self.fitness_scores[individuo] = self.checar_restrições(individuo)
+        # Avalia cada indivíduo (objeto `solucao`) e guarda os scores em uma lista
+        self.fitness_scores = [self.checar_restrições(ind) for ind in self.population]
 
     # -------------------------------
     # 3) Seleção por torneio
     # -------------------------------
     def selecao(self):
-        selecionados = []
-        for _ in range(self.tamanho_populacao):
-            a, b = random.sample(self.populacao, 2)
-            vencedor = a if a["fitness"] > b["fitness"] else b
-            selecionados.append(vencedor)
-        return selecionados
-
+        pass
     # -------------------------------
     # 4) Crossover de um ponto
     # -------------------------------
     def crossover(self, pai1, pai2):
-        if random.random() > self.taxa_crossover:
-            return pai1["genes"][:], pai2["genes"][:]  # sem crossover
-
-        ponto = random.randint(1, self.tamanho_individuo - 1)
-        filho1 = pai1["genes"][:ponto] + pai2["genes"][ponto:]
-        filho2 = pai2["genes"][:ponto] + pai1["genes"][ponto:]
-        return filho1, filho2
+        pass
 
     # -------------------------------
     # 5) Mutação bit-flip
     # -------------------------------
     def mutacao(self, individuo):
-        for i in range(len(individuo)):
-            if random.random() < self.taxa_mutacao:
-                individuo[i] = 1 - individuo[i]  # flip 0->1 ou 1->0
-        return individuo
+       pass
 
     # -------------------------------
     # 6) Geração da nova população
     # -------------------------------
     def nova_geracao(self, selecionados):
-        nova_pop = []
-
-        for i in range(0, self.tamanho_populacao, 2):
-            pai1 = selecionados[i]
-            pai2 = selecionados[(i+1) % self.tamanho_populacao]
-
-            filho1_genes, filho2_genes = self.crossover(pai1, pai2)
-            filho1_genes = self.mutacao(filho1_genes)
-            filho2_genes = self.mutacao(filho2_genes)
-
-            nova_pop.append({"genes": filho1_genes, "fitness": 0})
-            nova_pop.append({"genes": filho2_genes, "fitness": 0})
-
-        return nova_pop[:self.tamanho_populacao]
+        pass
 
 if __name__ == "__main__":
 
-    test = AGSimples(tamanho_populacao=2, taxa_mutacao=0.01, taxa_crossover=0.7, numero_geracoes=2000)
+    test = AGSimples(tamanho_populacao=100, taxa_mutacao=0.01, taxa_crossover=0.7, numero_geracoes=2000)
     test.inicializar_populacao()
     print(test.population)
+    test.avaliar_populacao()
+    print(test.fitness_scores)
