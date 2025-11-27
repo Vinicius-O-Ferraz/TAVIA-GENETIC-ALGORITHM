@@ -30,6 +30,8 @@ professores = {
     "Emerson Andrade":["EAD"],
     "Lucas Albertins":["POO"],
     "Janaina Sampaio":["LIB"],
-    "Marcos Cardoso":["PSED"],
+    "Marcos Cardoso":["PSED","EMP"],
     "Ricardo Souza":["ER"],
+    "Leandro Marques":["JGD"],
+    "Fernando Aires":["SEG"]
 }
