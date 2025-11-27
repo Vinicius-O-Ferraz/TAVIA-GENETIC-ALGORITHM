@@ -113,8 +113,10 @@ class AGSimples(AlgoritmoAbstrato):
 
 if __name__ == "__main__":
 
-    test = AGSimples(tamanho_populacao=100, taxa_mutacao=0.01, taxa_crossover=0.7, numero_geracoes=2000)
+    score = []
+    test = AGSimples(tamanho_populacao=1000, taxa_mutacao=0.01, taxa_crossover=0.7, numero_geracoes=2000)
     test.inicializar_populacao()
-    print(test.population)
+    # print(test.population)
     test.avaliar_populacao()
-    print(test.fitness_scores)
+    print(max((test.fitness_scores))) 
+    print(min((test.fitness_scores))) 

@@ -42,7 +42,6 @@ def random_initialize_solution(sol_id=1, turmas=None, repeticoes=2):
     if turmas is None:
         turmas = make_turmas_from_professores(professores, repeticoes=repeticoes)
 
-<<<<<<< HEAD
     slots = []
     for p_idx, p in enumerate(s.periodos):
         rows = len(p.matriz)
@@ -50,10 +49,9 @@ def random_initialize_solution(sol_id=1, turmas=None, repeticoes=2):
         for r in range(rows):
             for c in range(cols):
                 slots.append((p_idx, r, c))
-=======
-    # ORGANIZA as cópias por matéria
+
+    # Agrupa turmas por matéria (ex: PCO -> [PCO-1, PCO-2])
     grupos = agrupar_por_materia(turmas)
->>>>>>> 74e3d83550ad6f2fbb7cc119ede073deb3e16a9a
 
     # Mapeia cada matéria para um período fixo
     materia_para_periodo = {}
@@ -62,27 +60,23 @@ def random_initialize_solution(sol_id=1, turmas=None, repeticoes=2):
 
     # PARA CADA MATÉRIA:
     for materia, grupo in grupos.items():
-
         # pega o período escolhido
         p_idx = materia_para_periodo[materia]
         periodo = s.periodos[p_idx]
 
         # coleta posições livres nesse período
-        slots = [(r, c) for r in range(len(periodo.matriz)) for c in range(len(periodo.matriz[0]))]
-        random.shuffle(slots)
+        local_slots = [(r, c) for r in range(len(periodo.matriz)) for c in range(len(periodo.matriz[0]))]
+        random.shuffle(local_slots)
 
-        # aloca TODAS as cópias *no mesmo período*
-        for t, (r, c) in zip(grupo, slots):
+        # aloca TODAS as cópias *no mesmo período* (até caber)
+        for t, (r, c) in zip(grupo, local_slots):
             periodo.matriz[r][c] = t.id_turma
 
     return s
 
-<<<<<<< HEAD
 def main():
     s = random_initialize_solution(sol_id=1)
 
-=======
->>>>>>> 74e3d83550ad6f2fbb7cc119ede073deb3e16a9a
 if __name__ == '__main__':
     pop = []
     for i in range(10):
