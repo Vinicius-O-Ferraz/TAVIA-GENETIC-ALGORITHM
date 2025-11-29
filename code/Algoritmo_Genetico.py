@@ -91,7 +91,7 @@ class AlgoritmoGenetico(ABC):
         e seleciona aquele com maior fitness.
         Retorna um array de tamanho_populacao indivíduos selecionados para crossover.
         """
-        selecionados = []
+        selecionados = [max(self.population, key=lambda ind: self.checar_restrições(ind))]  # Elitismo: mantém o melhor indivíduo
         for _ in range(self.tamanho_populacao):
             # Sorteia 2 índices aleatórios distintos
             idx1, idx2 = random.sample(range(self.tamanho_populacao), 2)
@@ -274,10 +274,10 @@ class ExperimentoAG:
             print(f"Execução {i+1}/{self.n_execucoes}")
 
             ag = self.ag_class(
-                tamanho_populacao=100,
-                taxa_mutacao=0.1,
-                taxa_crossover=0.8,
-                numero_geracoes=self.max_geracoes
+                tamanho_populacao=200,
+                taxa_mutacao=0.3,
+                taxa_crossover=0.9,
+                numero_geracoes=500
             )
 
             ag.inicializar_populacao()
