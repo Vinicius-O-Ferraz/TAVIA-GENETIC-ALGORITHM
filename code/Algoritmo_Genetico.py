@@ -1,4 +1,3 @@
-from algoritmo_abstrato import AlgoritmoAbstrato
 from Random_Init import random_initialize_solution
 import random
 from Solucao import solucao
@@ -6,9 +5,6 @@ import matplotlib.pyplot as plt
 import random
 from abc import ABC, abstractmethod
 
-# -------------------------------------
-# Classe Abstrata
-# -------------------------------------
 class AlgoritmoGenetico(ABC):
 
     def __init__(self, tamanho_populacao, taxa_mutacao, taxa_crossover, numero_geracoes):
