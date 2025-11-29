@@ -2,7 +2,7 @@ from algoritmo_abstrato import AlgoritmoAbstrato
 from Random_Init import random_initialize_solution
 import random
 from Solucao import solucao
-
+import matplotlib.pyplot as plt
 import random
 from abc import ABC, abstractmethod
 
@@ -264,15 +264,125 @@ class AlgoritmoGenetico(ABC):
         # retorna o objeto solucao com melhor fitness
         best_idx = max(range(len(self.fitness_scores)), key=lambda i: self.fitness_scores[i])
         return self.population[best_idx]
+    
+class ExperimentoAG:
+    def __init__(self, ag_class, n_execucoes=100, max_geracoes=2000):
+        self.ag_class = ag_class
+        self.n_execucoes = n_execucoes
+        self.max_geracoes = max_geracoes
+        self.resultados = []  # Guarda dicts {'gen_found': int|None, 'time': float}
 
+    def executar_experimentos(self):
+        import time
+        for i in range(self.n_execucoes):
+            print(f"Execução {i+1}/{self.n_execucoes}")
 
-if __name__ == '__main__':
-    # Executa AG com as configurações solicitadas
-    ag = AlgoritmoGenetico(tamanho_populacao=100, taxa_mutacao=0.1, taxa_crossover=0.8, numero_geracoes=2000)
-    best = ag.executar()
-    # Avalia e imprime o resultado
-    ag.avaliar_populacao()
-    best_idx = max(range(len(ag.fitness_scores)), key=lambda i: ag.fitness_scores[i])
-    print('Melhor fitness encontrado:', ag.fitness_scores[best_idx])
-    print('Melhor solução:')
-    print(best)
+            ag = self.ag_class(
+                tamanho_populacao=100,
+                taxa_mutacao=0.1,
+                taxa_crossover=0.8,
+                numero_geracoes=self.max_geracoes
+            )
+
+            ag.inicializar_populacao()
+
+            start = time.perf_counter()
+            gen_found = None
+
+            # Executa geração por geração
+            for geracao in range(ag.numero_geracoes):
+                ag.avaliar_populacao()
+
+                # Se existe aptidão 2, registra
+                if 2 in ag.fitness_scores:
+                    gen_found = geracao
+                    break
+
+                selecionados = ag.selecao()
+                ag.population = ag.nova_geracao(selecionados)
+
+            elapsed = time.perf_counter() - start
+            self.resultados.append({'gen_found': gen_found, 'time': elapsed})
+
+        return self.resultados
+
+    def plotar_resultados(self):
+        # Construir listas apenas com execuções que encontraram solução
+        all_execs = list(range(1, self.n_execucoes + 1))
+        found_execs = []
+        found_gens = []
+        not_found_count = 0
+
+        for idx, r in enumerate(self.resultados):
+            gen = None
+            if isinstance(r, dict):
+                gen = r.get('gen_found')
+            # Considera não encontrado quando None ou igual ao limite de gerações
+            if gen is None or gen == self.max_geracoes:
+                not_found_count += 1
+            else:
+                found_execs.append(idx + 1)
+                found_gens.append(gen)
+
+        plt.figure(figsize=(12,6))
+
+        if found_execs:
+            plt.scatter(found_execs, found_gens, c='tab:blue')
+
+        plt.xlabel("Execução")
+        plt.ylabel("Geração em que aptidão = 2")
+        plt.title("Execuções do AG e geração onde aptidão=2 foi atingida")
+        plt.grid(True)
+        plt.show()
+
+        print(f"Número de execuções que não encontraram solução: {not_found_count} de {self.n_execucoes}")
+
+if __name__ == "__main__":
+    exp = ExperimentoAG(AlgoritmoGenetico, n_execucoes=10)
+    
+    resultados = exp.executar_experimentos()
+    print("Resultados:", resultados)
+
+    # Calcula e exibe estatísticas solicitadas
+    import statistics
+
+    # Excluir execuções que não encontraram solução (None) ou que atingiram o máximo de gerações
+    max_gen = exp.max_geracoes
+    filtered = [r for r in resultados if isinstance(r, dict) and r.get('gen_found') is not None and r.get('gen_found') != max_gen]
+
+    excluded_count = len(resultados) - len(filtered)
+
+    times = [r['time'] for r in filtered]
+    gens = [r['gen_found'] for r in filtered]
+
+    if times:
+        mean_time = statistics.mean(times)
+        min_time = min(times)
+        max_time = max(times)
+        var_time = statistics.pvariance(times)
+
+        print('\nEstatísticas de Tempo (somente execuções válidas):')
+        print(f'  Média tempo: {mean_time:.6f}s')
+        print(f'  Menor tempo: {min_time:.6f}s')
+        print(f'  Maior tempo: {max_time:.6f}s')
+        print(f'  Variância tempo: {var_time:.6f}')
+    else:
+        print('\nEstatísticas de Tempo: nenhuma execução válida para calcular (todas falharam ou atingiram max de gerações)')
+
+    if gens:
+        mean_gen = statistics.mean(gens)
+        min_gen = min(gens)
+        max_gen_val = max(gens)
+        var_gen = statistics.pvariance(gens)
+
+        print('\nEstatísticas de Gerações (somente execuções válidas):')
+        print(f'  Média gerações: {mean_gen:.2f}')
+        print(f'  Menor geração: {min_gen}')
+        print(f'  Maior geração: {max_gen_val}')
+        print(f'  Variância gerações: {var_gen:.2f}')
+    else:
+        print('\nEstatísticas de Gerações: nenhuma execução válida para calcular (todas falharam ou atingiram max de gerações)')
+
+    print(f"\nExecuções excluídas (não encontraram ou atingiram {max_gen}): {excluded_count} de {len(resultados)}")
+
+    exp.plotar_resultados()
